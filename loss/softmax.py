@@ -7,7 +7,7 @@ import torch.nn.functional as F
 import time, pdb, numpy
 from utils import accuracy
 
-import numpy as ns
+import numpy as np
 from collections import OrderedDict
 
 class LossFunction(nn.Module):
