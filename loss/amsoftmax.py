@@ -8,7 +8,7 @@ import torch.nn.functional as F
 import time, pdb, numpy
 from utils import accuracy
 
-import numpy as ns
+import numpy as np
 from collections import OrderedDict
 
 class LossFunction(nn.Module):
@@ -35,7 +35,7 @@ class LossFunction(nn.Module):
     def forward(self, x, label=None):
 
         assert x.size()[0] == label.size()[0]
-        assert x.size()[1] == self.in_feats
+        assert x.size()[1] == self.nOut
 
         if self.dropmode:		
         	W = self.W[self.rem_classes]
