@@ -201,7 +201,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
 # --------
         if args.use_dropclass:
-            if it % args.its_per_drop == 0 or iterations == 1:
+            if it % args.its_per_drop == 0 or it == 1:
                 trainLoader, trainer = drop_classes(trainer, args.nClasses, num_drop=args.num_drop)
 # --------
         loss, traineer = trainer.train_network(trainLoader, verbose=(args.gpu == 0));
