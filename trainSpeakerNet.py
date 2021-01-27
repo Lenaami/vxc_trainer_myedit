@@ -261,7 +261,7 @@ def drop_classes(trainer, nClasses, num_drop=1000):
     assert (num_drop < nClasses), "Can't drop all classes"
     
     classes_to_drop = list(np.random.choice(nClasses, size=num_drop, replace=False))
-    trainer.__model__.module.__L__.set_ignored_classes(classes_to_drop) # будет ли работать ? нужно ли module ? просто добавить функции ? 
+    trainer.set_ignored_classes(classes_to_drop)
     dataset_loader = get_data_loader(args.train_list, classes_to_drop,**vars(args))
 
     return dataset_loader, trainer

@@ -60,6 +60,8 @@ class SpeakerNet(nn.Module):
 
             return nloss, prec1
 
+    def set_ignored_classes(self, ignored:list):
+        self.__L__.set_ignored_classes(ignored)
 
 class ModelTrainer(object):
 
@@ -255,3 +257,5 @@ class ModelTrainer(object):
 
             self_state[name].copy_(param);
 
+    def set_ignored_classes(self, ignored:list):
+        self.__S__.set_ignored_classes(ignored);
