@@ -21,6 +21,9 @@ class WrappedModel(nn.Module):
 
     def forward(self, x, label=None):
         return self.module(x, label)
+    
+    def set_ignored_classes(self, ignored:list):
+        self.module.set_ignored_classes(ignored);
 
 
 class SpeakerNet(nn.Module):
@@ -101,7 +104,7 @@ class ModelTrainer(object):
         top1    = 0     # EER or accuracy
 
         tstart = time.time()
-        
+
         for data, data_label in loader:
 
             data    = data.transpose(1,0)
@@ -138,7 +141,7 @@ class ModelTrainer(object):
                 sys.stdout.flush();
 
             if self.lr_step == 'iteration': self.__scheduler__.step()
-
+        
         if self.lr_step == 'epoch': self.__scheduler__.step()
 
         sys.stdout.write("\n");
@@ -261,4 +264,4 @@ class ModelTrainer(object):
 
 # -------
     def set_ignored_classes(self, ignored:list):
-        self.__S__.set_ignored_classes(ignored);
+        self.__model__.set_ignored_classes(ignored);

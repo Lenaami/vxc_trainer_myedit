@@ -11,39 +11,39 @@ import numpy as np
 from collections import OrderedDict
 
 class LossFunction(nn.Module):
-	def __init__(self, nOut, nClasses, **kwargs):
-	    super(LossFunction, self).__init__()
+    def __init__(self, nOut, nClasses, **kwargs):
+        super(LossFunction, self).__init__()
 
-	    self.test_normalize = True
-	    
-	    self.criterion  = torch.nn.CrossEntropyLoss()
+        self.test_normalize = True
 
-	    print('Initialised Softmax Loss')
+        self.criterion  = torch.nn.CrossEntropyLoss()
+
+        print('Initialised Softmax Loss')
 # -------
-		self.n_classes = nClasses
+        self.n_classes = nClasses
         self.dropmode = False # Default is the normal behaviour
         self.set_ignored_classes([])
 
         self.W = nn.Parameter(torch.FloatTensor(nClasses, nOut))
         nn.init.xavier_uniform_(self.W)
 # -------
-	
-	def forward(self, x, label=None):
+
+    def forward(self, x, label=None):
         '''
         input (x): (batch_size, num_features): FloatTensor
         label (optional): (batch_size): LongTensor
         '''
-		if self.dropmode:		
-        	W = self.W[self.rem_classes]
-			label = self.get_mini_labels(label.detach()).to(device)
+        if self.dropmode:		
+            W = self.W[self.rem_classes]
+            label = self.get_mini_labels(label.tolist()).cuda()
         else:
-			W = self.W
-		
-		x = F.linear(x, W)
-		nloss   = self.criterion(x, label)
-		prec1	= accuracy(x.detach(), label.detach(), topk=(1,))[0]
+            W = self.W
 
-		return nloss, prec1
+        x = F.linear(x, W)
+        nloss   = self.criterion(x, label)
+        prec1	= accuracy(x.detach(), label.detach(), topk=(1,))[0]
+
+        return nloss, prec1
 
 # -------
     def drop(self):

@@ -125,23 +125,25 @@ class voxceleb_loader(Dataset):
         self.label_dict = {}
         self.data_list  = []
         self.data_label = []
-        
-        for lidx, line in enumerate(lines):
+# -------        
+        l_count = 0
+        for line in lines:
             data = line.strip().split();
 
             speaker_label = dictkeys[data[0]];
-# -------
+
             if classes_to_drop is not None:
                 if speaker_label in classes_to_drop:
                     continue
-# -------
+
             filename = os.path.join(train_path,data[1]);
 
             if not (speaker_label in self.label_dict):
                 self.label_dict[speaker_label] = [];
 
-            self.label_dict[speaker_label].append(lidx);
-            
+            self.label_dict[speaker_label].append(l_count);
+            l_count += 1
+# -------            
             self.data_label.append(speaker_label)
             self.data_list.append(filename)
 

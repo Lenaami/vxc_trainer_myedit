@@ -37,11 +37,11 @@ class LossFunction(nn.Module):
         assert x.size()[0] == label.size()[0]
         assert x.size()[1] == self.nOut
 
-        if self.dropmode:		
-        	W = self.W[self.rem_classes]
-			label = self.get_mini_labels(label.detach()).to(device)
+        if self.dropmode:
+            W = self.W[self.rem_classes]
+            label = self.get_mini_labels(label.tolist()).cuda()
         else:
-			W = self.W
+            W = self.W
 
         # normalize features
         x = F.normalize(x)

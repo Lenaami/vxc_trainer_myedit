@@ -3,7 +3,7 @@
 
 import sys, time, os, argparse, socket
 import yaml
-import numpy
+import numpy as np
 import pdb
 import torch
 import glob
@@ -14,6 +14,8 @@ from SpeakerNet import *
 from DatasetLoader import get_data_loader
 import torch.distributed as dist
 import torch.multiprocessing as mp
+
+import warnings
 
 # ## ===== ===== ===== ===== ===== ===== ===== =====
 # ## Parse arguments
@@ -137,6 +139,11 @@ def main_worker(gpu, ngpus_per_node, args):
     ## Write args to scorefile
     scorefile   = open(args.result_save_path+"/scores.txt", "a+");
 
+    for items in vars(args):
+        #print(items, vars(args)[items]);
+        scorefile.write('%s %s\n'%(items, vars(args)[items]));
+    scorefile.flush()
+
     ## Initialise trainer and data loader
     trainLoader = get_data_loader(args.train_list, None, **vars(args));
     trainer     = ModelTrainer(s, **vars(args))
@@ -214,7 +221,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 result = tuneThresholdfromScore(sc, lab, [1, 0.1]);
 
                 print("IT %d, VEER %2.4f"%(it, result[1]));
-                scorefile.write("IT %d, VEER %2.4f\n"%(it, result[1]));
+                scorefile.write("\nIT %d, VEER %2.4f\n\n"%(it, result[1]));
 
             trainer.saveParameters(args.model_save_path+"/model%09d.model"%it);
 
@@ -232,7 +239,9 @@ def main_worker(gpu, ngpus_per_node, args):
 
 
 def main():
-
+# -------
+    warnings.filterwarnings('ignore')
+# -------
     args.model_save_path     = args.save_path+"/model"
     args.result_save_path    = args.save_path+"/result"
     args.feat_save_path      = ""
