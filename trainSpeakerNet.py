@@ -144,8 +144,7 @@ def main_worker(gpu, ngpus_per_node, args):
         scorefile.write('%s %s\n'%(items, vars(args)[items]));
     scorefile.flush()
 
-    ## Initialise trainer and data loader
-    trainLoader = get_data_loader(args.train_list, None, **vars(args));
+    ## Initialise trainer
     trainer     = ModelTrainer(s, **vars(args))
 
     ## Load model weights
@@ -176,6 +175,12 @@ def main_worker(gpu, ngpus_per_node, args):
         sc, lab, _ = trainer.evaluateFromList(**vars(args))
         result = tuneThresholdfromScore(sc, lab, [1, 0.1]);
 
+        scfile = open(args.result_save_path+"/answers.txt", "a+");
+        for s in sc:
+            scfile.write('%f\n'%(s));
+        scfile.flush()
+        scfile.close();
+
         p_target = 0.05
         c_miss = 1
         c_fa = 1
@@ -185,6 +190,9 @@ def main_worker(gpu, ngpus_per_node, args):
 
         print('EER %2.4f MinDCF %.5f'%(result[1],mindcf))
         quit();
+
+    ## Initialise data loader
+    trainLoader = get_data_loader(args.train_list, None, **vars(args));
 
     ## Save training code and params
     if args.gpu == 0:
@@ -221,7 +229,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 result = tuneThresholdfromScore(sc, lab, [1, 0.1]);
 
                 print("IT %d, VEER %2.4f"%(it, result[1]));
-                scorefile.write("\nIT %d, VEER %2.4f\n\n"%(it, result[1]));
+                scorefile.write("\nIT %d, VEER %2.4f\n"%(it, result[1]));
 
             trainer.saveParameters(args.model_save_path+"/model%09d.model"%it);
 
