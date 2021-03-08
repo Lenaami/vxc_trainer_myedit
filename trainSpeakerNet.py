@@ -175,7 +175,7 @@ def main_worker(gpu, ngpus_per_node, args):
         sc, lab, _ = trainer.evaluateFromList(**vars(args))
         result = tuneThresholdfromScore(sc, lab, [1, 0.1]);
 
-        scfile = open(args.result_save_path+"/answers.txt", "a+");
+        scfile = open(args.result_save_path+"/answer.txt", "a+");
         for s in sc:
             scfile.write('%f\n'%(s));
         scfile.flush()

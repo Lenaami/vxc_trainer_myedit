@@ -11,6 +11,8 @@ from DatasetLoader import test_dataset_loader
 
 from torch.cuda.amp import autocast, GradScaler
 
+from sklearn import preprocessing
+
 class WrappedModel(nn.Module):
 
     ## The purpose of this wrapper is to make the model structure consistent between single and multi-GPU
@@ -153,7 +155,7 @@ class ModelTrainer(object):
     ## Evaluate from list
     ## ===== ===== ===== ===== ===== ===== ===== =====
 
-    def evaluateFromList(self, test_list, test_path, nDataLoaderThread, print_interval=100, num_eval=10, **kwargs):
+    def evaluateFromList(self, test_list, test_path, nDataLoaderThread, eval, print_interval=100, num_eval=10, **kwargs):
         
         self.__model__.eval();
         
@@ -212,10 +214,13 @@ class ModelTrainer(object):
                 ref_feat = F.normalize(ref_feat, p=2, dim=1)
                 com_feat = F.normalize(com_feat, p=2, dim=1)
 
-            dist = F.pairwise_distance(ref_feat.unsqueeze(-1), com_feat.unsqueeze(-1).transpose(0,2)).detach().cpu().numpy();
-
-            score = -1 * numpy.mean(dist);
-
+            if eval == True:
+                dist = F.cosine_similarity(ref_feat.unsqueeze(-1), com_feat.unsqueeze(-1)).detach().cpu().numpy();
+                score = numpy.mean(dist);
+            else:
+                dist = F.pairwise_distance(ref_feat.unsqueeze(-1), com_feat.unsqueeze(-1).transpose(0,2)).detach().cpu().numpy();
+                score = -1 * numpy.mean(dist);
+            
             all_scores.append(score);  
             all_labels.append(int(data[0]));
             all_trials.append(data[1]+" "+data[2])
@@ -224,6 +229,9 @@ class ModelTrainer(object):
                 telapsed = time.time() - tstart
                 sys.stdout.write("\rComputing %d of %d: %.2f Hz"%(idx,len(lines),idx/telapsed));
                 sys.stdout.flush();
+
+        if eval == True:
+            all_scores = preprocessing.MinMaxScaler().fit_transform(numpy.asarray(all_scores).reshape(-1, 1))
 
         print('')
 
